@@ -1,0 +1,24 @@
+sudo: required
+
+services:
+  - docker
+
+language: scala
+scala:
+  - 2.9.3
+
+env:
+  global:
+  - secure: kC/ZBmN/0zURT0gluAlmcbhR7gvFnU0zV9eL/QaT/hgY8UnCsD3lugZFRMUXRzYeSP0pBnwJjsM1Q/zkwplSPry7TKyqwP2ce7a7p0IP1j6z9uIyX1dRNPVHzgEPST01hdyxxvP+z/bM7nRbiZVISAwTVlOQVxEISr69+b4g6SozlMKNdvUGfR/sq60ncss3svUVxYMT1bKcAEZ/rKQm8oxQHATYYNezwEiYEYCIMdzyNIHL0DXyL/KcYO6fg2Z6YH6F2I/gAlO29aICSOWUqNE8bqNdka3YtJJfQHqJ9eT9qw2Rp9KzZl38yuwiQr/1o33b9i/kFd/Qjw3ERyH60NA5IIlY/78/pwD6q3DHzP8D69N587bRwTVrZqtT6eVFLOi4iGmdgn3tYwYscb+C58Y/lXBBgmsXs6Dyggg/PQY+dSqLgTyMzMTo7QPPsD4jrflJX4dDxJpZG957t4RZf9THZzpxuvPXkJVgS8qqV8o9Z+JGa3JLiq5/M2juSot/myTNLsnrFgat/QInWH9mHa6KRZilsUS1EQdV9r3tpwm/7Pec6uiLwM3zH8GUsRuv2ZtkNlBLgltOQmMspRUNSxUf/5Dk5B8alxNrHmUyxbunDyAvSQ66uGOk03WmXAaYKPiiWTxO7b2Z2r9afAaebzbILLUNlu0f4xLWT92ypaU=
+  - secure: amLJQNWmFyLtW72G5k3DEyILlHffMaeT9Wp6MvcDscJqrSe0jFvVo2xol+hBXNxRab7F55cKVKBCW7z60G7jyg2XYHiPXODaaAswP8k+3K1OGbp/OWvXaO4uB93vR84nt+1M3B+OM0I9gfWawYEwsIhkpcwRd0hMm7R3vrhiavT0XPGw1vH/XyU5IeWGlGpFcE9kpCPBSW1JFyVvgnSgJT/hSUBn4hY2vS9TFxq4uLDAkx/nipGcALJ8puYtUODn1B5NMbg/k8qOeqH7Xc3VUF5q+1zMfgwJSYFTW/RPJanW5nTp//C77kFlLfDGgMnYt5SmIhAHK40XntlRbm+Hl8hn0FnbsoDT+aMdG6Q9RVUv7cHrW1AyLI+pPOyrc4woQYqlYtqS1eZEtULwVKXXLM35GcztYyTL0kFQGsqpmcBfUgUqClCaSjDoALpTHXwCH2Pf00b/NrEYOEtnRZnsB4MWAvgfl4WHZsw9z8qQnKwx/nieJ7cjxHNKVVnggjsP6JbpN9kOUfIVkt+XDPjIoZMBrzF9Xwh9fdh7/8h65FkUr6EO2bCm0sqsGJgvhGyT95irMAfJvt/scDqzZOR2+Cn8GD9cftWV+qjx2+VOLWmJckYHGUBsdlZVh9V04uaKjNR+3UfBGPO+DHwa+4HMSYRJIDRwQ6uRbxRKpJpgV4I=
+  - secure: D3196Z0VQNeIqry7qbbAWoPzfj4kHY9b2xf5Y8ivOBiFXWnw1JJKQn1wB9b+ECFd8bGpjwSTin01X5UuuIxifhw82Sd/xXw1COFDaL3yhE3KzVKQID3kw9q32Hr4c25qIoliiioWjZbegv4ggxPNbHBHicXnDvaB+uzyOG0IzounyR7ydb068nCKNvqrKPUrRLEl1einPRzTq/rp2c7bnpE2Ikch8RI/bAxZHnB1xjNmDh+tI7rl2nGZR1GXsaapxQrQw526U9Q3/mRlC0q1ly1dGhc4EIVUTiK+ZiCG8ePOaZTRnrGWqI/Hn1DfuLG2YQglUJMgjkyheA4UfG0eYWsZiRnK0Dxb+nh4TcsOlkiIiG2Ah0q8P058cQDXq0prQpyatmlSnFCm2fb1r9IkAsDl0CSWtFm/GzxIF/bTXmivKy5jJKFn2ZSHYWSlh8Qj3K2ZtUlD1eWYrimFlChCd5Rtfbw0tLhm6hXQagr6A+gmgzfYP/ypl+DDiSL1Wwt5+6Dc5agE0fvVbft8HRCC/jtKBQ/pBOGD36kJfLJIdGmtixxSBmpkdViZ1aIHFo6W0ZTAY3TyGV9ndmhqcM5Hi79gUqsft5744lKPoEPfGv6bdn+rOn3FdUJwM4cxt9LupDSKB3G0V8o2KNCJ9W795mYE1elRFZkQM/2/P/jaxvc=
+  - COMMIT=${TRAVIS_COMMIT::8}
+
+after_success:
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=nles/sbt-multiproject-example
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
